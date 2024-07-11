@@ -22,9 +22,9 @@ class User
 
     public function update($id, $first_name, $last_name, $email, $password, $phone)
     {
-        $stmt = $this->pdo->prepare('UPDATE users SET id = ?, first_name = ?, last_name = ?, email = ? WHERE password = ?, phone = ?');
+        $stmt = $this->pdo->prepare('UPDATE users SET first_name = ?, last_name = ?, email = ?, password = ?, phone = ? WHERE id = ?');
+        $stmt->execute([$first_name, $last_name, $email, $password, $phone, $id]);
 
-        $stmt->execute([$id, $first_name, $last_name, $email, $password, $phone]);
         return ["message" => "user updated successfully"];
     }
 
