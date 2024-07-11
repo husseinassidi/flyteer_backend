@@ -19,6 +19,12 @@ class User
         $stmt = $this->pdo->query('SELECT * FROM users');
         return $stmt->fetchAll();
     }
+    public function readOne($id)
+    {
+        $stmt = $this->pdo->query('SELECT * FROM users where id=?');
+        $stmt->execute([$id]);
+        return $stmt->fetchAll();
+    }
 
     public function update($id, $first_name, $last_name, $email, $password, $phone)
     {
