@@ -5,10 +5,9 @@ header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-include_once '../../config/config.php'; // Include the correct config file
-include_once '../../models/FlightBooking.php';
+include_once '../../../config/config.php';
+include_once '../../../models/FlightBooking.php';
 
-// Use the function from the config file to get the connection
 $db = getDBConnection();
 
 if ($db === null) {
@@ -19,16 +18,30 @@ if ($db === null) {
 
 $flightBooking = new FlightBooking($db);
 
-$data = json_decode(file_get_contents("php://input"));
+$input = file_get_contents("php://input");
+$data = json_decode($input);
 
-$flightBooking->user_id = $data->user_id;
-$flightBooking->flight_id = $data->flight_id;
+if (is_null($data)) {
+    http_response_code(400);
+    echo json_encode(array("message" => "Invalid JSON", "input" => $input));
+    exit;
+}
 
-if ($flightBooking->create()) {
-    http_response_code(201);
-    echo json_encode(array("message" => "Flight booking was created."));
+if (isset($data->user_id) && isset($data->flight_id)) {
+    $flightBooking->user_id = $data->user_id;
+    $flightBooking->flight_id = $data->flight_id;
+
+    $response = $flightBooking->create();
+
+    if (isset($response['success'])) {
+        http_response_code(201);
+        echo json_encode(array("message" => $response['success']));
+    } else {
+        http_response_code(400);
+        echo json_encode(array("message" => $response['error']));
+    }
 } else {
-    http_response_code(503);
-    echo json_encode(array("message" => "Unable to create flight booking."));
+    http_response_code(400);
+    echo json_encode(array("message" => "Invalid input structure", "data" => $data));
 }
 ?>
