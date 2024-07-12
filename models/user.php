@@ -14,10 +14,23 @@ class User
             return ["message" => "All fields are required."];
         }
 
+        // Check if the email already exists
         $stmt = $this->pdo->prepare('SELECT * FROM users WHERE email = ?');
         $stmt->execute([$email]);
         if ($stmt->rowCount() > 0) {
             return ["message" => "Email already exists"];
+        }
+
+        // Check if the phone number already exists
+        $stmt = $this->pdo->prepare('SELECT * FROM users WHERE phone = ?');
+        $stmt->execute([$phone]);
+        if ($stmt->rowCount() > 0) {
+            return ["message" => "Phone number already exists"];
+        }
+
+        // Validate Lebanese phone number format
+        if (!preg_match('/^\+961\d{8}$/', $phone)) {
+            return ["message" => "Invalid Lebanese phone number format. It should start with +961 and have 8 digits"];
         }
 
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
