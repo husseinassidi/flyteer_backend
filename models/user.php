@@ -12,7 +12,7 @@ class User
     {
         $stmt = $this->pdo->prepare('INSERT INTO users (first_name, last_name, email, password,phone) VALUES (?, ?, ?, ?,?)');
         $stmt->execute([$first_name, $last_name, $email, $password, $phone]);
-        return ["message" => "user company created successfully"];
+        return ["message" => "user created successfully"];
     }
     public function read()
     {
