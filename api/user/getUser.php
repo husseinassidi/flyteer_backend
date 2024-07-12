@@ -1,7 +1,7 @@
 <?php
 // Include configuration and model files
 require_once '../../config/config.php';
-require_once '../../models/User.php';
+require_once '../../models/user.php';
 
 // Get POST data
 $data = json_decode(file_get_contents("php://input"));
