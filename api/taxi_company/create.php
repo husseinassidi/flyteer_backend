@@ -1,16 +1,34 @@
 <?php
+header("Access-Control-Allow-Origin: *");
+header("Content-Type: application/json; charset=UTF-8");
+
 require_once '../../config/config.php';
-require_once '../../models/TaxiCompany.php';
+require_once '../../models/taxi_company.php';
 
-$pdo = new PDO($dsn, $user, $pass, $options);
-$taxiCompany = new TaxiCompany($pdo);
+$conn = getDBConnection();
 
-$data = json_decode(file_get_contents("php://input"));
+if ($conn) {
+    $taxiCompany = new TaxiCompany($conn);
 
-if(isset($data->taxi_company_name) && isset($data->taxi_company_number) && isset($data->taxi_company_email) && isset($data->taxi_company_address)) {
-    $response = $taxiCompany->create($data->taxi_company_name, $data->taxi_company_number, $data->taxi_company_email, $data->taxi_company_address);
-    echo json_encode($response);
+    $data = json_decode(file_get_contents("php://input"));
+
+    if (
+        isset($data->taxi_company_name) &&
+        isset($data->taxi_company_number) &&
+        isset($data->taxi_company_email) &&
+        isset($data->taxi_company_address)
+    ) {
+        $response = $taxiCompany->create(
+            $data->taxi_company_name,
+            $data->taxi_company_number,
+            $data->taxi_company_email,
+            $data->taxi_company_address
+        );
+        echo json_encode($response);
+    } else {
+        echo json_encode(["error" => "Invalid input"]);
+    }
 } else {
-    echo json_encode(["error" => "Invalid input"]);
+    echo json_encode(["error" => "Database connection failed"]);
 }
 ?>

@@ -12,7 +12,7 @@ class User
     {
         $stmt = $this->pdo->prepare('INSERT INTO users (first_name, last_name, email, password,phone) VALUES (?, ?, ?, ?,?)');
         $stmt->execute([$first_name, $last_name, $email, $password, $phone]);
-        return ["message" => "user company created successfully"];
+        return ["message" => "user created successfully"];
     }
     public function read()
     {
@@ -21,10 +21,15 @@ class User
     }
     public function readOne($id)
     {
-        $stmt = $this->pdo->query('SELECT * FROM users where id=?');
-        $stmt->execute([$id]);
-        return $stmt->fetchAll();
+        try {
+            $stmt = $this->pdo->prepare('SELECT * FROM users WHERE id = ?');
+            $stmt->execute([$id]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);  // Only get associative array results
+        } catch (PDOException $e) {
+            return "Error: " . $e->getMessage();
+        }
     }
+
 
     public function update($id, $first_name, $last_name, $email, $password, $phone)
     {
