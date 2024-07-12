@@ -14,14 +14,16 @@ class User
             return ["message" => "All fields are required."];
         }
 
-        // Check if the email already exists
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return ["message" => "Invalid email format"];
+        }
+
         $stmt = $this->pdo->prepare('SELECT * FROM users WHERE email = ?');
         $stmt->execute([$email]);
         if ($stmt->rowCount() > 0) {
             return ["message" => "Email already exists"];
         }
 
-        // Check if the phone number already exists
         $stmt = $this->pdo->prepare('SELECT * FROM users WHERE phone = ?');
         $stmt->execute([$phone]);
         if ($stmt->rowCount() > 0) {
@@ -84,6 +86,16 @@ class User
     {
         if (empty($first_name) || empty($last_name) || empty($email) || empty($password) || empty($phone)) {
             return ["message" => "All fields are required."];
+        }
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return ["message" => "Invalid email format"];
+        }
+
+        $stmt = $this->pdo->prepare('SELECT * FROM users WHERE email = ? AND id != ?');
+        $stmt->execute([$email, $id]);
+        if ($stmt->rowCount() > 0) {
+            return ["message" => "Email already exists"];
         }
 
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
