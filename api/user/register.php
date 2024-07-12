@@ -1,12 +1,15 @@
 <?php
-// Include configuration and model files
+// Include configuration file
 require_once '../../config/config.php';
-require_once '../../models/User.php';
+
+// Get the PDO object
+$pdo = getDBConnection();
 
 // Get POST data
 $data = json_decode(file_get_contents("php://input"));
 
-// Initialize User model
+// Initialize User model with the PDO object
+require_once '../../models/user.php';
 $userModel = new User($pdo);
 
 // Example of registering a user
