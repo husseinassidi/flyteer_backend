@@ -30,7 +30,6 @@ class User
             return ["message" => "Phone number already exists"];
         }
 
-        // Validate Lebanese phone number format
         if (!preg_match('/^\+961\d{8}$/', $phone)) {
             return ["message" => "Invalid Lebanese phone number format. It should start with +961 and have 8 digits"];
         }
