@@ -8,7 +8,6 @@ $userModel = new User($pdo);
 
 $response = $userModel->read();
 
-// Optionally, add error handling if delete fails or no data found
 if (!$response) {
     echo json_encode(['message' => 'Failed to fetch users']);
 } else {
