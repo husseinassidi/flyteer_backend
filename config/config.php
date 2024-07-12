@@ -19,3 +19,5 @@ function getDBConnection()
 }
 
 $pdo = getDBConnection();  // Initialize $pdo here and make sure it's accessible globally
+
+?>
