@@ -1,14 +1,14 @@
 <?php
 require_once '../../config/config.php';
-require_once __DIR__ . '/../../../models/taxi_booking.php';
+require_once '../../models/taxi.php';
 
 $pdo = getDBConnection();
-$taxiBooking = new TaxiBooking($pdo);
+$taxi = new Taxi($pdo);
 
 $data = json_decode(file_get_contents("php://input"));
 
-if (isset($data->user_id) && isset($data->taxi_id) && isset($data->pickup_location) && isset($data->dropoff_location) && isset($data->pickup_time)) {
-    $response = $taxiBooking->create($data->user_id, $data->taxi_id, $data->pickup_location, $data->dropoff_location, $data->pickup_time);
+if (isset($data->taxi_company_name) && isset($data->location) && isset($data->price_per_km) && isset($data->available_cars)) {
+    $response = $taxi->create($data->taxi_company_name, $data->location, $data->price_per_km, $data->available_cars);
     echo json_encode($response);
 } else {
     echo json_encode(["error" => "Invalid input"]);
