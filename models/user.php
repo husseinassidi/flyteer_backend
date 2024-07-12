@@ -98,15 +98,28 @@ class User
         ];
     }
 
-    public function delete($id)
+    public function delete($id = null, $email = null)
     {
-        $stmt = $this->pdo->prepare('DELETE FROM users WHERE id = ?');
-        $stmt->execute([$id]);
-
-        $rowCount = $stmt->rowCount();
-        return [
-            "message" => "User deleted successfully",
-            "rowCount" => $rowCount
-        ];
+        if ($id) {
+            $stmt = $this->pdo->prepare('DELETE FROM users WHERE id = ?');
+            $stmt->execute([$id]);
+            $rowCount = $stmt->rowCount();
+            if ($rowCount > 0) {
+                return ["message" => "User deleted successfully by ID", "rowCount" => $rowCount];
+            } else {
+                return ["message" => "User not found with provided ID"];
+            }
+        } elseif ($email) {
+            $stmt = $this->pdo->prepare('DELETE FROM users WHERE email = ?');
+            $stmt->execute([$email]);
+            $rowCount = $stmt->rowCount();
+            if ($rowCount > 0) {
+                return ["message" => "User deleted successfully by email", "rowCount" => $rowCount];
+            } else {
+                return ["message" => "User not found with provided email"];
+            }
+        } else {
+            return ["message" => "ID or Email is required for deletion"];
+        }
     }
 }

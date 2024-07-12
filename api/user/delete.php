@@ -6,10 +6,14 @@ $data = json_decode(file_get_contents("php://input"));
 
 $userModel = new User($pdo);
 
-$response = $userModel->delete($data->id);
+$response = null;
 
-if (!$response) {
-    echo json_encode(['message' => 'Failed to delete user or user not found']);
+if (isset($data->id)) {
+    $response = $userModel->delete($data->id);
+} elseif (isset($data->email)) {
+    $response = $userModel->delete(null, $data->email);
 } else {
-    echo json_encode($response);
+    $response = ['message' => 'ID or Email is required for deletion'];
 }
+
+echo json_encode($response);
