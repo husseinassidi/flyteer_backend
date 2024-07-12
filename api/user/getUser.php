@@ -6,11 +6,11 @@ require_once '../../models/User.php';
 // Get POST data
 $data = json_decode(file_get_contents("php://input"));
 
-// Initialize User model
+// Assuming $pdo is defined and passed from the config.php file
 $userModel = new User($pdo);
 
-// Example of registering a user
-$response = $userModel->create($data->first_name, $data->last_name, $data->email, $data->password, $data->phone);
+// Example of retrieving a single user
+$response = $userModel->readOne($data->id);
 
 // Output response as JSON
 echo json_encode($response);
