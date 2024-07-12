@@ -1,32 +1,27 @@
 <?php
 class TaxiCompany {
-    private $pdo;
+    private $conn;
+    private $table_name = "taxi_company";
 
-    public function __construct($pdo) {
-        $this->pdo = $pdo;
+    public function __construct($db) {
+        $this->conn = $db;
     }
 
     public function create($name, $number, $email, $address) {
-        $stmt = $this->pdo->prepare('INSERT INTO taxi_companies (taxi_company_name, taxi_company_number, taxi_company_email, taxi_company_address) VALUES (?, ?, ?, ?)');
-        $stmt->execute([$name, $number, $email, $address]);
-        return ["message" => "Taxi company created successfully"];
-    }
+        $query = "INSERT INTO " . $this->table_name . " (taxi_company_name, taxi_company_number, taxi_company_email, taxi_company_address) VALUES (:name, :number, :email, :address)";
 
-    public function read() {
-        $stmt = $this->pdo->query('SELECT * FROM taxi_companies');
-        return $stmt->fetchAll();
-    }
+        $stmt = $this->conn->prepare($query);
 
-    public function update($id, $name, $number, $email, $address) {
-        $stmt = $this->pdo->prepare('UPDATE taxi_companies SET taxi_company_name = ?, taxi_company_number = ?, taxi_company_email = ?, taxi_company_address = ? WHERE taxi_company_id = ?');
-        $stmt->execute([$name, $number, $email, $address, $id]);
-        return ["message" => "Taxi company updated successfully"];
-    }
+        $stmt->bindParam(":name", htmlspecialchars(strip_tags($name)));
+        $stmt->bindParam(":number", htmlspecialchars(strip_tags($number)));
+        $stmt->bindParam(":email", htmlspecialchars(strip_tags($email)));
+        $stmt->bindParam(":address", htmlspecialchars(strip_tags($address)));
 
-    public function delete($id) {
-        $stmt = $this->pdo->prepare('DELETE FROM taxi_companies WHERE taxi_company_id = ?');
-        $stmt->execute([$id]);
-        return ["message" => "Taxi company deleted successfully"];
+        if ($stmt->execute()) {
+            return ["message" => "Taxi company created successfully."];
+        } else {
+            return ["error" => "Unable to create taxi company."];
+        }
     }
 }
 ?>
