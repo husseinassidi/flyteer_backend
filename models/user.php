@@ -29,9 +29,8 @@ class User
         if ($stmt->rowCount() > 0) {
             return ["message" => "Phone number already exists"];
         }
-
-        if (!preg_match('/^\+961\d{8}$/', $phone)) {
-            return ["message" => "Invalid Lebanese phone number format. It should start with +961 and have 8 digits"];
+        if (!preg_match('/^\+?\d{10,15}$/', $phone)) {
+            return ["message" => "Invalid phone number format. It should be 10 to 15 digits long and may start with a +"];
         }
 
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
