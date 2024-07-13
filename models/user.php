@@ -7,10 +7,24 @@ class User
     {
         $this->pdo = $pdo;
     }
+    public function checkUserExists($email, $phone, $exclude_id = null)
+    {
+        $query = 'SELECT 1 FROM users WHERE (email = ? OR phone = ?)';
+        $params = [$email, $phone];
+
+        if ($exclude_id !== null) {
+            $query .= ' AND id != ?';
+            $params[] = $exclude_id;
+        }
+
+        $stmt = $this->pdo->prepare($query);
+        $stmt->execute($params);
+        return $stmt->fetchColumn();
+    }
 
     public function create($first_name, $last_name, $email, $password, $phone)
     {
-        if (empty($first_name) || empty($last_name) || empty($email) || empty($password) || empty($phone)) {
+        if (!isset($first_name) || !isset($last_name) || !isset($email) || !isset($password) || !isset($phone)) {
             return ["message" => "All fields are required."];
         }
 
@@ -18,17 +32,10 @@ class User
             return ["message" => "Invalid email format"];
         }
 
-        $stmt = $this->pdo->prepare('SELECT * FROM users WHERE email = ?');
-        $stmt->execute([$email]);
-        if ($stmt->rowCount() > 0) {
-            return ["message" => "Email already exists"];
+        if ($this->checkUserExists($email, $phone)) {
+            return ["message" => "Email or phone number already exists"];
         }
 
-        $stmt = $this->pdo->prepare('SELECT * FROM users WHERE phone = ?');
-        $stmt->execute([$phone]);
-        if ($stmt->rowCount() > 0) {
-            return ["message" => "Phone number already exists"];
-        }
         if (!preg_match('/^\+?\d{10,15}$/', $phone)) {
             return ["message" => "Invalid phone number format. It should be 10 to 15 digits long and may start with a +"];
         }
@@ -60,7 +67,7 @@ class User
 
     public function login($email, $password)
     {
-        if (empty($email) || empty($password)) {
+        if (!isset($email) || !isset($password)) {
             return ["message" => "All fields are required."];
         }
 
@@ -82,7 +89,7 @@ class User
 
     public function update($id, $first_name, $last_name, $email, $password, $phone)
     {
-        if (empty($first_name) || empty($last_name) || empty($email) || empty($password) || empty($phone)) {
+        if (!isset($first_name) || !isset($last_name) || !isset($email) || !isset($password) || !isset($phone)) {
             return ["message" => "All fields are required."];
         }
 
@@ -90,10 +97,8 @@ class User
             return ["message" => "Invalid email format"];
         }
 
-        $stmt = $this->pdo->prepare('SELECT * FROM users WHERE email = ? AND id != ?');
-        $stmt->execute([$email, $id]);
-        if ($stmt->rowCount() > 0) {
-            return ["message" => "Email already exists"];
+        if ($this->checkUserExists($email, $phone, $id)) {
+            return ["message" => "Email or phone number already exists"];
         }
 
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
@@ -103,6 +108,7 @@ class User
 
         $rowCount = $stmt->rowCount();
         return [
+            "status" => "success",
             "message" => "User updated successfully",
             "rowCount" => $rowCount
         ];
