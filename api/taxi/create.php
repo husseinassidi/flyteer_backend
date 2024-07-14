@@ -10,10 +10,9 @@ $data = json_decode(file_get_contents("php://input"));
 
 
 
-if (isset($data->taxi_company_name) && isset($data->location) && isset($data->price_per_km)&& isset($data->license) && isset($data->driver_name)) {
-    // $response = $taxi->create($data->taxi_company_name, $data->location, $data->price_per_km);
+if (isset($data->taxi_company_name) && isset($data->location) && isset($data->price_per_km)&& isset($data->license) && isset($data->driver_name) && isset($data->color)&&isset($data->type)) {
 
-    $response= $taxi->create($data-> taxi_company_name,$data->location ,$data->price_per_km ,$data->license ,$data->driver_name);
+    $response= $taxi->create($data-> taxi_company_name,$data->location ,$data->price_per_km ,$data->license ,$data->driver_name,$data->color,$data->type);
 
 
     echo json_encode($response);
