@@ -46,6 +46,19 @@ class FlightBooking {
         return $stmt;
     }
 
+    // Read one booking
+    function readOne() {
+        $query = "SELECT * FROM " . $this->table_name . " WHERE booking_id = :booking_id LIMIT 0,1";
+
+        $stmt = $this->conn->prepare($query);
+
+        $stmt->bindParam(":booking_id", $this->booking_id);
+
+        $stmt->execute();
+
+        return $stmt;
+    }
+
     // Update an existing booking
     function update() {
         $query = "UPDATE " . $this->table_name . " SET flight_id = :flight_id, status = :status WHERE booking_id = :booking_id";
