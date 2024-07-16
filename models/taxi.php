@@ -38,10 +38,11 @@ class Taxi
 
     public function update($taxi_id, $taxi_company, $location, $price_per_km, $license, $driver_name, $color, $type)
     {
-        $stmt = $this->pdo->prepare('UPDATE taxis SET taxi_company = ?, location = ?, price_per_km = ?, license = ?, driver_name = ?, color=?, type = ?, WHERE taxi_id = ?');
+        $stmt = $this->pdo->prepare('UPDATE taxis SET taxi_company = ?, location = ?, price_per_km = ?, license = ?, driver_name = ?, color = ?, type = ? WHERE taxi_id = ?');
         $stmt->execute([$taxi_company, $location, $price_per_km, $license, $driver_name, $color, $type, $taxi_id]);
         return ["success" => "Taxi updated"];
     }
+
 
     public function delete($taxi_id)
     {
