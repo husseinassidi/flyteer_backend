@@ -14,10 +14,11 @@ $admin = new Admin($pdo);
 $data = json_decode(file_get_contents("php://input"));
 
 if (
-    !empty($data->first_name) &&
-    !empty($data->last_name) &&
-    !empty($data->email) &&
-    !empty($data->password)
+    isset($data->first_name) &&
+    isset($data->last_name) &&
+    isset($data->email) &&
+    isset($data->password) &&
+    isset($data->phone)
 ) {
     $admin->first_name = $data->first_name;
     $admin->last_name = $data->last_name;
@@ -25,15 +26,35 @@ if (
     $admin->password = $data->password;
     $admin->phone = $data->phone;
 
-    if ($admin->create()) {
-        http_response_code(201);
-        echo json_encode(array("message" => "Admin was created."));
-    } else {
-        http_response_code(503);
-        echo json_encode(array("message" => "Unable to create admin."));
+    $result = $admin->create();
+
+    switch ($result) {
+        case "success":
+            http_response_code(201);
+            echo json_encode(array("message" => "Admin was created."));
+            break;
+        case "email_exists":
+            http_response_code(400);
+            echo json_encode(array("message" => "Email already exists."));
+            break;
+        case "phone_exists":
+            http_response_code(400);
+            echo json_encode(array("message" => "Phone number already exists."));
+            break;
+        case "invalid_email":
+            http_response_code(400);
+            echo json_encode(array("message" => "Provide a valid email."));
+            break;
+        case "invalid_phone":
+            http_response_code(400);
+            echo json_encode(array("message" => "Provide a valid phone number."));
+            break;
+        default:
+            http_response_code(503);
+            echo json_encode(array("message" => "Unable to create admin."));
+            break;
     }
 } else {
     http_response_code(400);
     echo json_encode(array("message" => "Incomplete data."));
 }
-?>
