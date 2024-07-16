@@ -1,4 +1,7 @@
 <?php
+// Start output buffering to prevent any unintended output
+ob_start();
+
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST");
@@ -43,10 +46,14 @@ if ($stmt->rowCount() > 0) {
         "status" => $status
     );
 
+    // Clear output buffer and send JSON response
+    ob_end_clean();
     http_response_code(200);
     echo json_encode($flightBooking_item);
 } else {
+    // Clear output buffer and send JSON response
+    ob_end_clean();
     http_response_code(404);
     echo json_encode(array("message" => "Flight booking not found."));
-}   
+}
 ?>
