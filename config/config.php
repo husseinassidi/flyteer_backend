@@ -10,7 +10,7 @@ function getDBConnection()
     try {
         $conn = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME, DB_USER, DB_PASS);
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        echo "PDO connection successfully established.<br>";
+        // echo "PDO connection successfully established.<br>";
     } catch (PDOException $e) {
         echo "Connection error: " . $e->getMessage();
         return null;
@@ -18,6 +18,6 @@ function getDBConnection()
     return $conn;
 }
 
-$pdo = getDBConnection();  // Initialize $pdo here and make sure it's accessible globally
+$pdo = getDBConnection();
 
 ?>

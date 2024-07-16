@@ -31,7 +31,7 @@ if ($num > 0) {
         array_push($hotelBookings_arr["records"], $hotelBooking_item);
     }
 
-    http_response_code(200);
+    // http_response_code(200);
     echo json_encode($hotelBookings_arr);
 } else {
     http_response_code(404);
