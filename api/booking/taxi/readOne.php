@@ -17,15 +17,16 @@ if (!empty($data->id)) {
 
     $taxiBooking->id = htmlspecialchars(strip_tags($data->id));
 
-    if ($taxiBooking->delete()) {
-        http_response_code(200);
-        echo json_encode(array("message" => "Taxi booking was deleted."));
+    $result = $taxiBooking->readOne();
+
+    if ($result) {
+        echo json_encode($result);
     } else {
-        http_response_code(503);
-        echo json_encode(array("message" => "Unable to delete taxi booking."));
+        http_response_code(404);
+        echo json_encode(array("message" => "Taxi booking not found."));
     }
 } else {
     http_response_code(400);
-    echo json_encode(array("message" => "Unable to delete taxi booking. Data is incomplete."));
+    echo json_encode(array("message" => "Unable to retrieve taxi booking. Data is incomplete."));
 }
 ?>

@@ -16,9 +16,6 @@ $pdo = getDBConnection();
 $taxi = new Taxi($pdo);
 
 $data = json_decode(file_get_contents("php://input"));
-// add license and driver
-
-
 
 if (isset($data->taxi_company_name) && isset($data->location) && isset($data->price_per_km) && isset($data->license) && isset($data->driver_name) && isset($data->color) && isset($data->type)) {
 

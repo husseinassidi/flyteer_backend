@@ -14,9 +14,11 @@ require_once '../../models/taxi.php';
 
 // Get the PDO object
 $pdo = getDBConnection();
+
+// Initialize Taxi model with the PDO object
 $taxiModel = new Taxi($pdo);
 
-// Retrieve taxi data
+// Retrieve all taxis
 $response = $taxiModel->read();
 
 // Output response as JSON
