@@ -1,4 +1,9 @@
 <?php
+require '../../vendor/autoload.php';
+
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+
 class User
 {
     private $pdo;
@@ -6,6 +11,7 @@ class User
     public function __construct($pdo)
     {
         $this->pdo = $pdo;
+        session_start();
     }
     public function checkUserExists($email, $phone, $exclude_id = null)
     {
@@ -68,24 +74,74 @@ class User
     public function login($email, $password)
     {
         if (!isset($email) || !isset($password)) {
-            return ["message" => "All fields are required."];
+            return ["success" => false, "message" => "All fields are required."];
+        }
+
+        // First, check if the email is of an admin
+        $stmt = $this->pdo->prepare('SELECT * FROM admins WHERE email = ?');
+        $stmt->execute([$email]);
+        $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($admin) {
+            if (password_verify($password, $admin['password'])) {
+                $payload = [
+                    'iat' => time(),
+                    'exp' => time() + 3600,
+                    'sub' => $admin['admin_id'],
+                    'role' => 'admin'
+                ];
+
+                $jwt = JWT::encode($payload, '25515dqmui268nuiq%!2e1wq', 'HS256');
+
+                $_SESSION['user_id'] = $admin['admin_id'];
+                $_SESSION['user_email'] = $admin['email'];
+                $_SESSION['role'] = 'admin';
+                $_SESSION['logged_in'] = true;
+
+                return [
+                    "success" => true,
+                    "message" => "Admin login successful",
+                    "jwt" => $jwt
+                ];
+            } else {
+                return ["success" => false, "message" => "Invalid password"];
+            }
         }
 
         $stmt = $this->pdo->prepare('SELECT * FROM users WHERE email = ?');
         $stmt->execute([$email]);
-
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($user) {
             if (password_verify($password, $user['password'])) {
-                return ["message" => "Login successful"];
+                $payload = [
+                    'iat' => time(),
+                    'exp' => time() + 3600,
+                    'sub' => $user['id'],
+                    'role' => 'user'
+                ];
+
+                $jwt = JWT::encode($payload, '6f95f57f75d=-!', 'HS256');
+
+                $_SESSION['user_id'] = $user['id'];
+                $_SESSION['user_email'] = $user['email'];
+                $_SESSION['role'] = 'user';
+                $_SESSION['logged_in'] = true;
+
+                return [
+                    "success" => true,
+                    "message" => "User login successful",
+                    "jwt" => $jwt
+                ];
             } else {
-                return ["message" => "Invalid password"];
+                return ["success" => false, "message" => "Invalid password"];
             }
-        } else {
-            return ["message" => "User not found"];
         }
+
+        return ["success" => false, "message" => "User not found"];
     }
+
+
 
     public function update($id, $first_name, $last_name, $email, $password, $phone)
     {
