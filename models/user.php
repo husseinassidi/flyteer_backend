@@ -85,9 +85,9 @@ class User
         if ($admin) {
             if (password_verify($password, $admin['password'])) {
                 $payload = [
-                    'iat' => time(), // Issued at: time when the token was generated
-                    'exp' => time() + 3600, // Expiration time: 1 hour
-                    'sub' => $admin['admin_id'], // Subject of the token
+                    'iat' => time(),
+                    'exp' => time() + 3600,
+                    'sub' => $admin['admin_id'],
                     'role' => 'admin'
                 ];
 
@@ -108,7 +108,6 @@ class User
             }
         }
 
-        // If not an admin, check the users table
         $stmt = $this->pdo->prepare('SELECT * FROM users WHERE email = ?');
         $stmt->execute([$email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -122,7 +121,7 @@ class User
                     'role' => 'user'
                 ];
 
-                $jwt = JWT::encode($payload, 'your_secret_key', 'HS256');
+                $jwt = JWT::encode($payload, '6f95f57f75d=-!', 'HS256');
 
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_email'] = $user['email'];
@@ -139,7 +138,6 @@ class User
             }
         }
 
-        // If no record is found
         return ["success" => false, "message" => "User not found"];
     }
 
