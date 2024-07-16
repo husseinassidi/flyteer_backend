@@ -12,14 +12,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 require_once '../../config/config.php';
 require_once '../../models/taxi.php';
 
-$pdo = getDBConnection();
-$taxi = new Taxi($pdo);
-
 $data = json_decode(file_get_contents("php://input"));
 
-if (isset($data->taxi_id)) {
-    $response = $taxi->delete($data->taxi_id);
-    echo json_encode($response);
+$pdo = getDBConnection();
+
+$taxiModel = new Taxi($pdo);
+
+$response = $taxiModel->delete($data->taxi_id);
+
+if (!$response) {
+    echo json_encode(['message' => 'Failed to delete taxi or taxi not found']);
 } else {
-    echo json_encode(["error" => "Invalid input"]);
+    echo json_encode($response);
 }

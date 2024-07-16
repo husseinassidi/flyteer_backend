@@ -13,6 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 require_once '../../config/config.php';
 require_once '../../models/taxi.php';
 
+// Get the PDO object
 $pdo = getDBConnection();
 $taxiModel = new Taxi($pdo);
 

@@ -12,13 +12,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 require_once '../../config/config.php';
 require_once '../../models/taxi.php';
 
-// Get POST data
-$data = json_decode(file_get_contents("php://input"));
+// Get the PDO object
+$pdo = getDBConnection();
 
-// Assuming $pdo is defined and passed from the config.php file
+// Initialize Taxi model with the PDO object
 $taxiModel = new Taxi($pdo);
 
-// Example of retrieving a single user
+// Retrieve all taxis
 $response = $taxiModel->read();
 
 // Output response as JSON

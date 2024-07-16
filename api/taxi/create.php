@@ -10,11 +10,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 require_once '../../config/config.php';
-require_once '../../models/taxi.php';
 
+// Get the PDO object
 $pdo = getDBConnection();
-$taxi = new Taxi($pdo);
 
+// Get POST data
 $data = json_decode(file_get_contents("php://input"));
 // add license and driver
 
