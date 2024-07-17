@@ -1,4 +1,5 @@
 <?php
+
 class HotelBooking {
     private $conn;
     private $table_name = "hotel_booking";
@@ -9,6 +10,7 @@ class HotelBooking {
     public $check_in_date;
     public $check_out_date;
     public $status;
+    public $unique_id;
 
     public function __construct($db) {
         $this->conn = $db;
@@ -16,13 +18,17 @@ class HotelBooking {
 
     // Create hotel booking
     public function create() {
+        // Generate a unique identifier
+        $this->unique_id = uniqid();
+
         $query = "INSERT INTO " . $this->table_name . "
                   SET
                       user_id = :user_id,
                       hotel_id = :hotel_id,
                       check_in_date = :check_in_date,
                       check_out_date = :check_out_date,
-                      status = :status";
+                      status = :status,
+                      unique_id = :unique_id";
 
         $stmt = $this->conn->prepare($query);
 
@@ -32,6 +38,7 @@ class HotelBooking {
         $this->check_in_date = htmlspecialchars(strip_tags($this->check_in_date));
         $this->check_out_date = htmlspecialchars(strip_tags($this->check_out_date));
         $this->status = htmlspecialchars(strip_tags($this->status));
+        $this->unique_id = htmlspecialchars(strip_tags($this->unique_id));
 
         // Bind values
         $stmt->bindParam(":user_id", $this->user_id);
@@ -39,9 +46,10 @@ class HotelBooking {
         $stmt->bindParam(":check_in_date", $this->check_in_date);
         $stmt->bindParam(":check_out_date", $this->check_out_date);
         $stmt->bindParam(":status", $this->status);
+        $stmt->bindParam(":unique_id", $this->unique_id);
 
         if ($stmt->execute()) {
-            return true;
+            return $this->unique_id;
         }
 
         return false;
@@ -65,9 +73,10 @@ class HotelBooking {
                       hotel_id = :hotel_id,
                       check_in_date = :check_in_date,
                       check_out_date = :check_out_date,
-                      status = :status
+                      status = :status,
+                      unique_id = :unique_id
                   WHERE
-                      hotel_booking_id = :id";
+                      id = :id";
 
         $stmt = $this->conn->prepare($query);
 
@@ -78,6 +87,7 @@ class HotelBooking {
         $this->check_out_date = htmlspecialchars(strip_tags($this->check_out_date));
         $this->status = htmlspecialchars(strip_tags($this->status));
         $this->id = htmlspecialchars(strip_tags($this->id));
+        $this->unique_id = htmlspecialchars(strip_tags($this->unique_id));
 
         // Bind values
         $stmt->bindParam(":user_id", $this->user_id);
@@ -86,6 +96,7 @@ class HotelBooking {
         $stmt->bindParam(":check_out_date", $this->check_out_date);
         $stmt->bindParam(":status", $this->status);
         $stmt->bindParam(":id", $this->id);
+        $stmt->bindParam(":unique_id", $this->unique_id);
 
         if ($stmt->execute()) {
             return true;
@@ -96,15 +107,15 @@ class HotelBooking {
 
     // Delete hotel booking
     public function delete() {
-        $query = "DELETE FROM " . $this->table_name . " WHERE hotel_booking_id = :id";
+        $query = "DELETE FROM " . $this->table_name . " WHERE unique_id = :unique_id";
 
         $stmt = $this->conn->prepare($query);
 
         // Sanitize
-        $this->id = htmlspecialchars(strip_tags($this->id));
+        $this->unique_id = htmlspecialchars(strip_tags($this->unique_id));
 
         // Bind id
-        $stmt->bindParam(":id", $this->id);
+        $stmt->bindParam(":unique_id", $this->unique_id);
 
         if ($stmt->execute()) {
             return true;

@@ -5,3 +5,8 @@ RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ index.php?path=$1 [L,QSA]
+
+# Set Content Security Policy header
+<IfModule mod_headers.c>
+    Header set Content-Security-Policy "default-src 'none'; font-src 'self' https://fonts.googleapis.com;"
+</IfModule>

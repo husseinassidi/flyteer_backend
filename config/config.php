@@ -1,8 +1,12 @@
 <?php
+// its a file responsibe for creating connection with data base
+// require_once '../vendor/autoload.php';
+
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'flyteer');
 define('DB_USER', 'root');
 define('DB_PASS', '');
+
 
 function getDBConnection()
 {
@@ -21,3 +25,6 @@ function getDBConnection()
 $pdo = getDBConnection();
 
 ?>
+
+
+ 
