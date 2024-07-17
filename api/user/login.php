@@ -4,7 +4,6 @@ header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: DELETE, POST, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With");
 
-// Handle preflight OPTIONS request
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
@@ -34,7 +33,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     exit();
 }
 
-// Function to authenticate JWT
 function authenticate()
 {
     $headers = getallheaders();
@@ -47,7 +45,8 @@ function authenticate()
     }
 
     try {
-        $decoded = JWT::decode($jwt, new Key('your_secret_key', 'HS256'));
+        $secretKey = $_ENV['JWT_SECRET_KEY'];
+        $decoded = JWT::decode($jwt, new Key($secretKey, 'HS256'));
         return $decoded;
     } catch (Exception $e) {
         http_response_code(401);

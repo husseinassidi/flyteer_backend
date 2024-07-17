@@ -1,8 +1,13 @@
 <?php
 require '../../vendor/autoload.php';
 
+use Dotenv\Dotenv;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+
+// Load the .env file
+$dotenv = Dotenv::createImmutable(__DIR__);
+$dotenv->load();
 
 class User
 {
@@ -13,6 +18,7 @@ class User
         $this->pdo = $pdo;
         session_start();
     }
+
     public function checkUserExists($email, $phone, $exclude_id = null)
     {
         $query = 'SELECT 1 FROM users WHERE (email = ? OR phone = ?)';
@@ -65,7 +71,7 @@ class User
         try {
             $stmt = $this->pdo->prepare('SELECT * FROM users WHERE id = ?');
             $stmt->execute([$id]);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);  // Only get associative array results
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             return ["message" => "Error: " . $e->getMessage()];
         }
@@ -91,7 +97,7 @@ class User
                     'role' => 'admin'
                 ];
 
-                $jwt = JWT::encode($payload, '25515dqmui268nuiq%!2e1wq', 'HS256');
+                $jwt = JWT::encode($payload, $_ENV['JWT_SECRET_ADMIN'], 'HS256');
 
                 $_SESSION['user_id'] = $admin['admin_id'];
                 $_SESSION['user_email'] = $admin['email'];
@@ -121,7 +127,7 @@ class User
                     'role' => 'user'
                 ];
 
-                $jwt = JWT::encode($payload, '6f95f57f75d=-!', 'HS256');
+                $jwt = JWT::encode($payload, $_ENV['JWT_SECRET_USER'], 'HS256');
 
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_email'] = $user['email'];
@@ -140,8 +146,6 @@ class User
 
         return ["success" => false, "message" => "User not found"];
     }
-
-
 
     public function update($id, $first_name, $last_name, $email, $password, $phone)
     {
