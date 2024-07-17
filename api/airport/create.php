@@ -15,5 +15,4 @@ $airportModel = new Airport($pdo);
 // Example of creating an airport
 $response = $airportModel->create($data->name, $data->location);
 
-// Output response as JSON
 echo json_encode($response);
