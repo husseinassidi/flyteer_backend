@@ -1,34 +1,54 @@
 <?php
-header("Access-Control-Allow-Origin: http://127.0.0.1:5500");  // Adjust the origin as needed
+header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Methods: POST, OPTIONS");
+header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-// Include database and object files
-include_once '../../config/database.php';
-include_once '../../models/hotelBooking.php';
+// Handle preflight requests
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
 
-// Instantiate database and product object
-$database = new Database();
-$db = $database->getConnection();
+include_once '../../../config/config.php';
+include_once '../../../models/hotelBooking.php';
 
-// Initialize object
-$hotelBooking = new HotelBooking($db);
+$pdo = getDBConnection();
 
-// Get posted data
+// Check if connection was successful
+if ($pdo === null) {
+    http_response_code(500);
+    echo json_encode(array("message" => "Database connection failed."));
+    exit();
+}
+
+// Get the posted data
 $data = json_decode(file_get_contents("php://input"));
 
-// Set property values
-$hotelBooking->user_id = $data->user_id;
-$hotelBooking->hotel_id = $data->hotel_id;
-$hotelBooking->check_in_date = $data->check_in_date;
-$hotelBooking->check_out_date = $data->check_out_date;
-$hotelBooking->status = $data->status;
+// Make sure data is not empty
+if (!empty($data->user_id) && !empty($data->hotel_id) && !empty($data->check_in_date) && !empty($data->check_out_date) && !empty($data->status) && isset($data->unique_id)) {
+    // Initialize the hotel booking object
+    $hotelBooking = new HotelBooking($pdo);
 
-// Create the hotel booking
-if($unique_id = $hotelBooking->create()){
-    echo json_encode(array("message" => "Hotel booking was created.", "unique_id" => $unique_id));
-} else{
-    echo json_encode(array("message" => "Unable to create hotel booking."));
+    // Set hotel booking property values
+    $hotelBooking->user_id = htmlspecialchars(strip_tags($data->user_id));
+    $hotelBooking->hotel_id = htmlspecialchars(strip_tags($data->hotel_id));
+    $hotelBooking->check_in_date = htmlspecialchars(strip_tags($data->check_in_date));
+    $hotelBooking->check_out_date = htmlspecialchars(strip_tags($data->check_out_date));
+    $hotelBooking->status = htmlspecialchars(strip_tags($data->status));
+    $hotelBooking->unique_id = htmlspecialchars(strip_tags($data->unique_id)); // Set unique_id
+
+    // Create the hotel booking
+    if ($hotelBooking->create()) {
+        http_response_code(201);
+        echo json_encode(array("message" => "Hotel booking was created."));
+    } else {
+        http_response_code(503);
+        echo json_encode(array("message" => "Unable to create hotel booking."));
+    }
+} else {
+    http_response_code(400);
+    echo json_encode(array("message" => "Unable to create hotel booking. Data is incomplete."));
 }
 ?>

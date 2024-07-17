@@ -1,7 +1,7 @@
 <?php
 header("Access-Control-Allow-Origin: http://127.0.0.1:5500");
 header("Content-Type: application/json; charset=UTF-8");
-header("Access-Control-Allow-Methods: POST, OPTIONS");
+header("Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
 // Handle preflight requests
@@ -16,8 +16,8 @@ include_once '../../../models/HotelBooking.php';
 $pdo = getDBConnection();
 $data = json_decode(file_get_contents("php://input"), true);
 
-// Check if the unique_id is present
-if (!empty($data['unique_id'])) {
+// Ensure `unique_id` is provided
+if (isset($data['unique_id']) && !empty($data['unique_id'])) {
     $hotelBooking = new HotelBooking($pdo);
     $hotelBooking->unique_id = htmlspecialchars(strip_tags($data['unique_id']));
 
