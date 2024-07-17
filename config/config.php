@@ -1,13 +1,23 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = '';
-$db_name = 'flyteer';
+define('DB_HOST', 'localhost');
+define('DB_NAME', 'flyteer');
+define('DB_USER', 'root');
+define('DB_PASS', '');
 
-$conn = new mysqli($servername, $username, $password, $db_name);
-
-if ($conn->connect_error) {
-    die('connection failed' . $conn->connect_error);
-} else {
-    echo "connection established";
+function getDBConnection()
+{
+    $conn = null;
+    try {
+        $conn = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME, DB_USER, DB_PASS);
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        // echo "PDO connection successfully established.<br>";
+    } catch (PDOException $e) {
+        echo "Connection error: " . $e->getMessage();
+        return null;
+    }
+    return $conn;
 }
+
+$pdo = getDBConnection();
+
+?>
